@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: final-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: final-backend
+  template:
+    metadata:
+      labels:
+        app: final-backend
+    spec:
+      containers:
+      - name: backend
+        image: <dockerhub-username>/final-backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://mongo-service:27017/wanderlust"  # Ensure MongoDB service name matches in Kubernetes
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: final-backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP  # Backend is internal, so no need for LoadBalancer
